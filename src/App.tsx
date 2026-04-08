@@ -4,12 +4,13 @@
  */
 
 import { useState, useEffect } from 'react';
-import { Recipe, ApplicationType, SimulationResult } from './types';
+import { Recipe, ApplicationType, SimulationResult, OrderRecord } from './types';
 import { PhysicsEngine } from './lib/physics';
 import { RecipeEditor } from './components/RecipeEditor';
 import { PhysicsDashboard } from './components/PhysicsDashboard';
 import { OptimizerPanel } from './components/OptimizerPanel';
-import { Cpu, Activity, Settings, Info, Sparkles } from 'lucide-react';
+import { OrderForm, type OrderInput } from './components/OrderForm';
+import { Cpu, Activity, Settings, Info, Sparkles, ListChecks } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 
 export default function App() {
@@ -22,6 +23,7 @@ export default function App() {
 
   const [selectedApp, setSelectedApp] = useState<ApplicationType>('cremation');
   const [simulation, setSimulation] = useState<SimulationResult | null>(null);
+  const [orders, setOrders] = useState<OrderRecord[]>([]);
 
   useEffect(() => {
     const result = PhysicsEngine.simulateDrying(recipe);
@@ -31,6 +33,30 @@ export default function App() {
   const handleOptimize = () => {
     const optimal = PhysicsEngine.optimize(selectedApp);
     setRecipe(optimal);
+  };
+
+  const handleSubmitOrder = (input: OrderInput) => {
+    const order: OrderRecord = {
+      id: crypto.randomUUID(),
+      createdAt: new Date().toISOString(),
+      status: 'pending',
+      recipe,
+      application: input.application,
+      customer: {
+        fullName: input.fullName,
+        phone: input.phone,
+        organization: input.organization || undefined,
+        location: input.location,
+      },
+      quantityKg: input.quantityKg,
+      notes: input.notes || undefined,
+    };
+
+    setOrders(prev => [order, ...prev]);
+
+    // For now this is in-memory only; to persist, wire this to a backend endpoint.
+    alert('Order captured locally. Wire this to your backend to start receiving real orders.');
+    console.log('[BioForge] New order', order);
   };
 
   return (
@@ -73,7 +99,7 @@ export default function App() {
       <main className="flex-1 p-6 lg:p-10 max-w-[1600px] mx-auto w-full">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
           {/* Left Column - Controls */}
-          <motion.aside 
+          <motion.aside
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             className="lg:col-span-4 space-y-8"
@@ -81,42 +107,60 @@ export default function App() {
             <div className="gnome-card">
               <RecipeEditor recipe={recipe} onChange={setRecipe} />
             </div>
-            
+
             <div className="gnome-card">
-              <OptimizerPanel 
-                selectedApp={selectedApp} 
-                onSelect={setSelectedApp} 
-                onOptimize={handleOptimize} 
+              <OptimizerPanel
+                selectedApp={selectedApp}
+                onSelect={setSelectedApp}
+                onOptimize={handleOptimize}
               />
             </div>
 
-            <div className="p-6 bg-blue-500/5 rounded-2xl border border-blue-500/10 relative overflow-hidden group">
-              <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
-                <Cpu size={64} />
-              </div>
-              <h4 className="text-[11px] font-bold uppercase text-blue-400 mb-4 flex items-center gap-2">
-                <Cpu size={14} />
-                Neural Engine Status
-              </h4>
-              <div className="space-y-3 font-mono text-[11px] text-zinc-400">
-                <div className="flex justify-between items-center">
-                  <span className="text-zinc-500">Architecture</span>
-                  <span className="text-zinc-200 px-2 py-0.5 bg-white/5 rounded">GNN-PINN Hybrid</span>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-zinc-500">Inference Latency</span>
-                  <span className="text-emerald-400">0.042ms</span>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-zinc-500">Convergence</span>
-                  <span className="text-zinc-200">99.8%</span>
-                </div>
-              </div>
+            <div className="gnome-card">
+              <OrderForm recipe={recipe} application={selectedApp} onSubmit={handleSubmitOrder} />
             </div>
+
+            {orders.length > 0 && (
+              <div className="p-4 bg-zinc-950/60 rounded-2xl border border-zinc-800/80 space-y-3">
+                <div className="flex items-center justify-between gap-2">
+                  <div className="flex items-center gap-2 text-[11px] font-semibold text-zinc-300 uppercase tracking-wide">
+                    <ListChecks className="w-3.5 h-3.5 text-emerald-400" />
+                    Captured orders (local)
+                  </div>
+                  <span className="text-[10px] text-zinc-500">{orders.length} active</span>
+                </div>
+                <div className="space-y-2 max-h-40 overflow-y-auto pr-1.5">
+                  {orders.map(order => (
+                    <div
+                      key={order.id}
+                      className="flex items-start justify-between gap-3 rounded-xl border border-zinc-800/80 bg-zinc-950/60 px-3 py-2"
+                    >
+                      <div className="space-y-0.5">
+                        <p className="text-[11px] font-medium text-zinc-100">
+                          {order.customer.fullName}
+                          {order.customer.organization && (
+                            <span className="text-[10px] text-zinc-500"> · {order.customer.organization}</span>
+                          )}
+                        </p>
+                        <p className="text-[10px] text-zinc-500">
+                          {order.quantityKg} kg · {order.application} · {order.customer.location}
+                        </p>
+                      </div>
+                      <span className="shrink-0 rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/30 px-2 py-0.5 text-[10px] font-medium">
+                        Pending
+                      </span>
+                    </div>
+                  ))}
+                </div>
+                <p className="text-[10px] text-zinc-500">
+                  This list is in-memory only. Connect it to your backend/CRM to start processing real orders.
+                </p>
+              </div>
+            )}
           </motion.aside>
 
           {/* Right Column - Results */}
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
@@ -149,8 +193,8 @@ export default function App() {
           <div className="flex items-center gap-2">
             <span className="text-zinc-400">Motor Load</span>
             <div className="w-24 h-1 bg-white/5 rounded-full overflow-hidden">
-              <motion.div 
-                className="h-full bg-blue-500" 
+              <motion.div
+                className="h-full bg-blue-500"
                 animate={{ width: ['40%', '45%', '42%'] }}
                 transition={{ duration: 2, repeat: Infinity }}
               />
