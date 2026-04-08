@@ -176,7 +176,7 @@ export function OrderForm({ recipe, application, onSubmit }: OrderFormProps) {
 
       {submitted && (
         <p className="text-[11px] text-emerald-400 mt-1 text-center">
-          Order received, thank you.
+          Order received, Thank You!
         </p>
       )}
     </div>
