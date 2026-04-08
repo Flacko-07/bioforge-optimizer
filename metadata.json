@@ -1,0 +1,5 @@
+{
+  "name": "BioForge Optimizer",
+  "description": "AI-driven biomass briquette composition and process optimization tool using GNN/PINN architectures.",
+  "requestFramePermissions": []
+}

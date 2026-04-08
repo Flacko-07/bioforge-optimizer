@@ -1,0 +1,105 @@
+@import "tailwindcss";
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+@theme {
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
+}
+
+/* GNOME / Adwaita Dark Palette with modern twists */
+:root {
+  --gnome-bg: #1a1a1a;
+  --gnome-header: #242424;
+  --gnome-card: #2a2a2a;
+  --gnome-accent: #3584e4;
+  --gnome-accent-glow: rgba(53, 132, 228, 0.15);
+  --gnome-text: #ffffff;
+  --gnome-text-secondary: #a1a1aa;
+  --gnome-border: rgba(255, 255, 255, 0.06);
+}
+
+body {
+  background-color: var(--gnome-bg);
+  background-image: 
+    radial-gradient(at 0% 0%, rgba(53, 132, 228, 0.05) 0px, transparent 50%),
+    radial-gradient(at 100% 100%, rgba(16, 185, 129, 0.05) 0px, transparent 50%);
+  color: var(--gnome-text);
+  @apply antialiased overflow-x-hidden font-sans min-h-screen;
+}
+
+/* GNOME Style Headerbar */
+.header-bar {
+  background-color: rgba(36, 36, 36, 0.8);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--gnome-border);
+  height: 64px;
+  @apply flex items-center justify-between px-6 sticky top-0 z-50;
+}
+
+/* GNOME Style Card */
+.gnome-card {
+  background-color: var(--gnome-card);
+  border: 1px solid var(--gnome-border);
+  border-radius: 16px;
+  @apply p-6 shadow-xl transition-all duration-300;
+}
+
+.gnome-card:hover {
+  border-color: rgba(255, 255, 255, 0.12);
+  transform: translateY(-2px);
+}
+
+/* GNOME Style Button */
+.gnome-btn {
+  @apply px-5 py-2.5 rounded-xl font-medium transition-all text-sm flex items-center gap-2 active:scale-95;
+}
+
+.gnome-btn-primary {
+  background-color: var(--gnome-accent);
+  box-shadow: 0 4px 12px var(--gnome-accent-glow);
+  @apply text-white hover:opacity-90 hover:shadow-lg;
+}
+
+.gnome-btn-secondary {
+  background-color: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--gnome-border);
+  @apply text-zinc-300 hover:bg-white/10;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 10px;
+  border: 2px solid var(--gnome-bg);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+/* Range Input Styling */
+input[type="range"] {
+  @apply h-1.5 bg-white/5 rounded-full appearance-none cursor-pointer;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+  @apply w-5 h-5 bg-white rounded-full appearance-none cursor-pointer shadow-xl border-2 border-zinc-800 hover:scale-110 transition-transform;
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.5s ease-out forwards;
+}
