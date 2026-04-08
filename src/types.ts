@@ -38,6 +38,22 @@ export interface ApplicationTarget {
   };
 }
 
+export interface OrderRecord {
+  id: string;
+  createdAt: string;
+  status: 'pending' | 'confirmed' | 'fulfilled';
+  recipe: Recipe;
+  application: ApplicationType;
+  customer: {
+    fullName: string;
+    phone: string;
+    organization?: string;
+    location: string;
+  };
+  quantityKg: number;
+  notes?: string;
+}
+
 export const APPLICATIONS: ApplicationTarget[] = [
   {
     id: 'cremation',
