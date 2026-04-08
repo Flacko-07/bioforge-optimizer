@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, type FormEvent } from 'react';
 import type { ApplicationType, Recipe } from '../types';
 import { ClipboardList, Send, User, Phone, MapPin, Package } from 'lucide-react';
 
@@ -33,7 +33,7 @@ export function OrderForm({ recipe, application, onSubmit }: OrderFormProps) {
     setForm(prev => ({ ...prev, [field]: value }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!form.fullName.trim() || !form.phone.trim() || !form.location.trim()) {
       alert('Please fill in name, phone, and location to place an order.');
