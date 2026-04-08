@@ -10,7 +10,7 @@ import { RecipeEditor } from './components/RecipeEditor';
 import { PhysicsDashboard } from './components/PhysicsDashboard';
 import { OptimizerPanel } from './components/OptimizerPanel';
 import { OrderForm, type OrderInput } from './components/OrderForm';
-import { Cpu, Activity, Settings, Info, Sparkles, ListChecks } from 'lucide-react';
+import { Cpu, Activity, Settings, Info, Sparkles } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 
 export default function App() {
@@ -23,7 +23,6 @@ export default function App() {
 
   const [selectedApp, setSelectedApp] = useState<ApplicationType>('cremation');
   const [simulation, setSimulation] = useState<SimulationResult | null>(null);
-  const [orders, setOrders] = useState<OrderRecord[]>([]);
 
   useEffect(() => {
     const result = PhysicsEngine.simulateDrying(recipe);
@@ -52,11 +51,8 @@ export default function App() {
       notes: input.notes || undefined,
     };
 
-    setOrders(prev => [order, ...prev]);
-
-    // For now this is in-memory only; to persist, wire this to a backend endpoint.
-    alert('Order captured locally. Wire this to your backend to start receiving real orders.');
-    console.log('[BioForge] New order', order);
+    // For now we only log orders; wire this to a Vercel backend function to persist.
+    console.log('[BioForge] New order (to send to backend)', order);
   };
 
   return (
@@ -78,7 +74,7 @@ export default function App() {
         <div className="absolute left-1/2 -translate-x-1/2 flex flex-col items-center">
           <div className="flex items-center gap-2 px-4 py-1.5 bg-white/5 rounded-full border border-white/10">
             <Sparkles size={12} className="text-blue-400" />
-            <span className="text-[11px] font-bold uppercase tracking-wider text-zinc-300">GNN Mixture Model</span>
+            <span className="text-[11px] font-bold uppercase tracking-wider text-zinc-300">BioForge Optimizer</span>
           </div>
         </div>
 
@@ -119,44 +115,6 @@ export default function App() {
             <div className="gnome-card">
               <OrderForm recipe={recipe} application={selectedApp} onSubmit={handleSubmitOrder} />
             </div>
-
-            {orders.length > 0 && (
-              <div className="p-4 bg-zinc-950/60 rounded-2xl border border-zinc-800/80 space-y-3">
-                <div className="flex items-center justify-between gap-2">
-                  <div className="flex items-center gap-2 text-[11px] font-semibold text-zinc-300 uppercase tracking-wide">
-                    <ListChecks className="w-3.5 h-3.5 text-emerald-400" />
-                    Captured orders (local)
-                  </div>
-                  <span className="text-[10px] text-zinc-500">{orders.length} active</span>
-                </div>
-                <div className="space-y-2 max-h-40 overflow-y-auto pr-1.5">
-                  {orders.map(order => (
-                    <div
-                      key={order.id}
-                      className="flex items-start justify-between gap-3 rounded-xl border border-zinc-800/80 bg-zinc-950/60 px-3 py-2"
-                    >
-                      <div className="space-y-0.5">
-                        <p className="text-[11px] font-medium text-zinc-100">
-                          {order.customer.fullName}
-                          {order.customer.organization && (
-                            <span className="text-[10px] text-zinc-500"> · {order.customer.organization}</span>
-                          )}
-                        </p>
-                        <p className="text-[10px] text-zinc-500">
-                          {order.quantityKg} kg · {order.application} · {order.customer.location}
-                        </p>
-                      </div>
-                      <span className="shrink-0 rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/30 px-2 py-0.5 text-[10px] font-medium">
-                        Pending
-                      </span>
-                    </div>
-                  ))}
-                </div>
-                <p className="text-[10px] text-zinc-500">
-                  This list is in-memory only. Connect it to your backend/CRM to start processing real orders.
-                </p>
-              </div>
-            )}
           </motion.aside>
 
           {/* Right Column - Results */}
