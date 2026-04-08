@@ -34,7 +34,7 @@ export default function App() {
     setRecipe(optimal);
   };
 
-  const handleSubmitOrder = (input: OrderInput) => {
+  const handleSubmitOrder = async (input: OrderInput) => {
     const order: OrderRecord = {
       id: crypto.randomUUID(),
       createdAt: new Date().toISOString(),
@@ -51,8 +51,19 @@ export default function App() {
       notes: input.notes || undefined,
     };
 
-    // For now we only log orders; wire this to a Vercel backend function to persist.
-    console.log('[BioForge] New order (to send to backend)', order);
+    try {
+      const res = await fetch('/api/orders', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(order),
+      });
+
+      if (!res.ok) {
+        console.error('[BioForge] Order API failed', await res.text());
+      }
+    } catch (err) {
+      console.error('[BioForge] Network error sending order', err);
+    }
   };
 
   return (
