@@ -28,9 +28,11 @@ export function OrderForm({ recipe, application, onSubmit }: OrderFormProps) {
     application,
     notes: '',
   });
+  const [submitted, setSubmitted] = useState(false);
 
   const handleChange = (field: keyof OrderInput, value: string | number) => {
     setForm(prev => ({ ...prev, [field]: value }));
+    if (submitted) setSubmitted(false);
   };
 
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
@@ -40,6 +42,7 @@ export function OrderForm({ recipe, application, onSubmit }: OrderFormProps) {
       return;
     }
     onSubmit(form);
+    setSubmitted(true);
   };
 
   return (
@@ -170,6 +173,12 @@ export function OrderForm({ recipe, application, onSubmit }: OrderFormProps) {
           Submit order request
         </button>
       </form>
+
+      {submitted && (
+        <p className="text-[11px] text-emerald-400 mt-1 text-center">
+          Order received, thank you.
+        </p>
+      )}
     </div>
   );
 }
